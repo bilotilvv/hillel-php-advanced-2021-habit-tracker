@@ -6,3 +6,8 @@ services:
     php:
         ports:
             - "8000:8000"
+    mailer:
+        image: schickling/mailcatcher
+        ports:
+            - "1025"
+            - "1080"
