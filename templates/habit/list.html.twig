@@ -1,0 +1,55 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Habits{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <h2>My Habits</h2>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th>Habit</th>
+                            <td>
+                                <a class="btn btn-primary" href="{{ path('app_habit_add') }}">
+                                    <i class="bi bi-plus-square"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for habit in habits %}
+                        <tr>
+                            <th>
+                                <i class="bi bi-{{ habit.pointIcon }}" style="color: {{ habit.pointColor }}"></i>
+                                {{ habit.name }}
+                            </th>
+                            <td>
+                                <a class="btn btn-secondary float-start" href="{{ path('app_habit_edit', {habitId: habit.habitId}) }}">
+                                    <i class="bi bi-pencil-square"></i>
+                                </a>
+                                <form
+                                    method="POST"
+                                    action="{{ path('app_habit_delete', {habitId: habit.habitId}) }}"
+                                    class="float-start"
+                                    onsubmit="return confirm('Are you dure?')"
+                                >
+                                    {# <input type="hidden" name="_method" value="DELETE">#}
+                                    <button class="btn btn-danger">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}
