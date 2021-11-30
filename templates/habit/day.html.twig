@@ -32,7 +32,7 @@
                     {% for habit in habits %}
                         <tr>
                             <th scope="row">{{ habit.name }}</th>
-                            <th scope="row">{{ track_point.add_icon() }}</th>
+                            <th scope="row">{{ track_point.add_icon(habit, forDate) }}</th>
                             <td class="track-point-cell">{{ track_point.delete_icon(habit, forDate) }}</td>
                         </tr>
                     {% endfor %}
