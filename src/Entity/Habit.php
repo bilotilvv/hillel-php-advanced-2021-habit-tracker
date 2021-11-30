@@ -117,6 +117,21 @@ class Habit
         $this->trackPoints->add(new TrackPoint($this, $occurredAt));
     }
 
+    /**
+     * @return Collection&TrackPoint[]
+     */
+    public function getTrackPointsByDate(DateTimeInterface $occurredAt): Collection
+    {
+        $trackPoints = new ArrayCollection();
+        foreach ($this->trackPoints as $trackPoint) {
+            if ($trackPoint->getOccurredAt()->format('Y-m-d') === $occurredAt->format('Y-m-d')) {
+                $trackPoints[] = $trackPoint;
+            }
+        }
+
+        return $trackPoints;
+    }
+
     public function removeTrackPoint(DateTimeInterface $occurredAt): void
     {
         $occurredAtFormatted = $occurredAt->format('Y-m-d');

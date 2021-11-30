@@ -1,0 +1,21 @@
+{% macro render(habit, occurredAt) %}
+    {% if habit.getTrackPointsByDate(occurredAt).count() > 0 %}
+        {{ _self.delete_icon(habit, occurredAt) }}
+    {% else %}
+        {{ _self.add_icon() }}
+    {%  endif %}
+{% endmacro %}
+
+{% macro add_icon() %}
+    <i style="color: #aaa" class="bi bi-plus-square"></i>
+{% endmacro %}
+
+{% macro delete_icon(habit, occurredAt) %}
+    {% set trackPointCount = habit.getTrackPointsByDate(occurredAt).count() %}
+    {% if trackPointCount > 0 %}
+        <i style="color: {{ habit.pointColor }}" class="bi bi-{{ habit.pointIcon }}"></i>
+        {% if trackPointCount > 1 %}
+            <span class="badge bg-secondary">{{ trackPointCount <= 9 ? trackPointCount : '9+' }}</span>
+        {%  endif %}
+    {%  endif %}
+{% endmacro %}

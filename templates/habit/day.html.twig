@@ -1,0 +1,44 @@
+{% extends 'base.html.twig' %}
+
+{% import "habit/macros/track-point.html.twig" as track_point %}
+
+
+{% block title %}Day view{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <h2>
+                    {% set prevDay = forDate|date_modify('-1 day') %}
+                    {% set nextDay = forDate|date_modify('+1 day') %}
+                    <a class="h4" href="{{ path('app_habit_day', {'forDate': prevDay|date('Y-m-d')}) }}">{{ prevDay|date('jS F, Y') }}</a>
+                    << {{ forDate|date('jS F, Y') }} >>
+                    <a class="h4" href="{{ path('app_habit_day', {'forDate': nextDay|date('Y-m-d')}) }}">{{ nextDay|date('jS F, Y') }}</a>
+                </h2>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <table class="table table-striped table-hover">
+                    <thead>
+                    <tr>
+                        <th scope="col">Habit</th>
+                        <th scope="col"></th>
+                        <th scope="col">{{ forDate|date('jS F, Y') }}</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for habit in habits %}
+                        <tr>
+                            <th scope="row">{{ habit.name }}</th>
+                            <th scope="row">{{ track_point.add_icon() }}</th>
+                            <td class="track-point-cell">{{ track_point.delete_icon(habit, forDate) }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}

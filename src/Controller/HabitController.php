@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Habit;
 use App\Form\HabitFormType;
 use App\Repository\HabitRepository;
+use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -98,5 +99,45 @@ class HabitController extends AbstractController
         $entityManger->flush();
 
         return $this->redirectToRoute('app_habit_list');
+    }
+
+    /**
+     * @Route("/habits/day/{forDate}", methods={"GET"}, name="app_habit_day")
+     */
+    public function day(
+        UserInterface $user,
+        HabitRepository $habitRepository,
+        string $forDate = 'midnight'
+    ): Response {
+        $habits = $habitRepository->findBy(['userId' => $user->getUserId()]);
+
+        return $this->render('habit/day.html.twig', [
+            'forDate' => new DateTimeImmutable($forDate),
+            'habits'  => $habits,
+        ]);
+    }
+
+    /**
+     * @Route("/habits/week/{year}/{week}", methods={"GET"}, name="app_habit_week")
+     */
+    public function week(
+        UserInterface   $user,
+        HabitRepository $habitRepository,
+        string          $year = null,
+        string          $week = null
+    ): Response {
+        $today = new DateTimeImmutable('midnight');
+        $year = $year ?? $today->format('Y');
+        $week = $week ?? $today->format('W');
+        $fromDate = $today->setISODate($year, $week);
+        $toDate = $fromDate->modify('Next Sunday');
+
+        $habits = $habitRepository->findBy(['userId' => $user->getUserId()]);
+
+        return $this->render('habit/week.html.twig', [
+            'fromDate' => $fromDate,
+            'toDate'   => $toDate,
+            'habits'   => $habits,
+        ]);
     }
 }

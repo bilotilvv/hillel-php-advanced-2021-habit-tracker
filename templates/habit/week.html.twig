@@ -1,0 +1,65 @@
+{% extends 'base.html.twig' %}
+
+{% import "habit/macros/track-point.html.twig" as track_point %}
+
+{% block title %}Week view{% endblock %}
+
+{% block body %}
+    <div class="container habit-track">
+        <div class="row">
+            <div class="col">
+                <h2>
+                    {% set prevFromDate = fromDate|date_modify('-1 week') %}
+                    {% set prevYear = prevFromDate|date('Y') %}
+                    {% set prevWeek = prevFromDate|date('W') %}
+
+                    {% set nextFromDate = fromDate|date_modify('+1 week') %}
+                    {% set nextYear = nextFromDate|date('Y') %}
+                    {% set nextWeek = nextFromDate|date('W') %}
+
+                    <a href="{{ path('app_habit_week', {'year': prevYear, 'week': prevWeek}) }}">&lt;&lt;</a>
+                    {% if fromDate|date('Y-m') == toDate|date('Y-m') %}
+                        {{ fromDate|date('jS') }} / {{ toDate|date('jS') }} {{ toDate|date('F, Y') }}
+                    {% elseif fromDate|date('Y') == toDate|date('Y') %}
+                        {{ fromDate|date('jS F') }} / {{ toDate|date('jS F') }}, {{ toDate|date('Y') }}
+                    {% else %}
+                        {{ fromDate|date('jS F, Y') }} / {{ toDate|date('jS F, Y') }}
+                    {% endif %}
+                    <a href="{{ path('app_habit_week', {'year': nextYear, 'week': nextWeek}) }}">&gt;&gt;</a>
+                </h2>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th scope="col">Habit</th>
+                            {% set today = date().format('Y-m-d') %}
+                            {% for i in 0..6 %}
+                                {% set currentDate = fromDate|date_modify('+' ~ i ~ ' day') %}
+                                {% set isWeekend = currentDate|date('N') in [6, 7] %}
+                                {% set isToday = currentDate.format('Y-m-d') == today %}
+                                <th scope="col" class="{{ isWeekend ? 'weekend' : '' }} {{ isToday ? 'today' : '' }}">{{ currentDate|date('m/d') }}</th>
+                            {%  endfor %}
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                    {% for habit in habits %}
+                        <tr>
+                            <th scope="row">{{ habit.name }}</th>
+                            {% for i in 0..6 %}
+                                {% set occurredAt = fromDate|date_modify('+' ~ i ~ ' day') %}
+                                <td class="track-point-cell">
+                                    {{ track_point.render(habit, occurredAt) }}
+                                </td>
+                            {%  endfor %}
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}
