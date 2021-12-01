@@ -26,7 +26,7 @@ services:
             - ./docker/dev/php/php.ini:/usr/local/etc/php/php.ini
             - ./docker/dev/.bashrc:/home/student/.bashrc
             # It helps install packages from cache
-            #- composer-cache:/home/student/.composer
+            - composer-cache:/home/student/.composer
         working_dir: /app
         user:  ${DOCKER_COMPOSE__USER_ID:-1000}:${DOCKER_COMPOSE__GROUP_ID:-1000}
 
