@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Habit Tracker - Welcome!{% endblock %}
+{% block title %}My habits - Habit Tracker!{% endblock %}
 
 {% block body %}
     <div class="container">
@@ -19,6 +19,48 @@
                         </div>
                     {% endfor %}
                 {% endfor %}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <table class="table table-striped table-hover">
+                    <thead>
+                    <tr>
+                        <th>Habit</th>
+                        <th>
+                            <a class="btn btn-primary" href="{{ path('app_habit_add') }}">
+                                <i class="bi bi-plus-square"></i>
+                            </a>
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for habit in habits %}
+                        <tr>
+                            <th>
+                                <i class="bi bi-{{ habit.pointIcon }}" style="color: {{ habit.pointColor }}"></i>
+                                {{ habit.name }}
+                            </th>
+                            <td>
+                                <a class="btn btn-secondary float-start" href="{{ path('app_habit_edit', {habitId: habit.id}) }}">
+                                    <i class="bi bi-pencil-square"></i>
+                                </a>
+                                <form
+                                        method="POST"
+                                        action="{{ path('app_habit_delete', {habitId: habit.id}) }}"
+                                        class="float-start"
+                                        onsubmit="return confirm('Are you sure?')"
+                                >
+                                    {# <input type="hidden" name="_method" value="DELETE">#}
+                                    <button class="btn btn-danger">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
