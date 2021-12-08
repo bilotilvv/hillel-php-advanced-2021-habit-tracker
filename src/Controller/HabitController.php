@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Habit;
 use App\Form\HabitFormType;
 use App\Repository\HabitRepository;
+use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -99,5 +100,81 @@ class HabitController extends AbstractController
         $entityManger->flush();
 
         return $this->redirectToRoute('app_habit_list');
+    }
+
+    /**
+     * @Route("/habits/week/{year}/{week}", methods={"GET"}, name="app_habit_week")
+     */
+    public function week(
+        UserInterface   $user,
+        HabitRepository $habitRepository,
+        string          $year = null,
+        string          $week = null
+    ): Response {
+        $today = new DateTimeImmutable('midnight');
+        $year = $year ?? $today->format('Y');
+        $week = $week ?? $today->format('W');
+        $fromDate = $today->setISODate($year, $week);
+        $toDate = $fromDate->modify('Next Sunday');
+
+        $habits = $habitRepository->findBy(['userId' => $user->getUserId()]);
+
+        return $this->render('habit/week.html.twig', [
+            'fromDate' => $fromDate,
+            'toDate'   => $toDate,
+            'habits'   => $habits,
+        ]);
+    }
+
+    /**
+     * @Route("/habit/{habitId}/track-point/{date}/add", methods={"POST"}, name="app_habit_add_track_point")
+     */
+    public function addTrackPoint(
+        int                    $habitId,
+        string                 $date,
+        UserInterface          $user,
+        HabitRepository        $habitRepository,
+        EntityManagerInterface $entityManager
+    ): Response {
+        $habit = $habitRepository->findOneBy(['id' => $habitId, 'userId' => $user->getUserId()]);
+        if (null === $habit) {
+            throw new NotFoundHttpException('Habit not found');
+        }
+
+        $occurredAt = new DateTimeImmutable($date);
+        $habit->addTrackPoint($occurredAt);
+
+        $entityManager->flush();
+
+        return $this->redirectToRoute(
+            'app_habit_week',
+            ['year' => $occurredAt->format('Y'), 'week' => $occurredAt->format('W')]
+        );
+    }
+
+    /**
+     * @Route("/habit/{habitId}/track-point/{date}/delete", methods={"POST"}, name="app_habit_delete_track_point")
+     */
+    public function deleteTrackPoint(
+        int                    $habitId,
+        string                 $date,
+        UserInterface          $user,
+        HabitRepository        $habitRepository,
+        EntityManagerInterface $entityManager
+    ): Response {
+        $habit = $habitRepository->findOneBy(['id' => $habitId, 'userId' => $user->getUserId()]);
+        if (null === $habit) {
+            throw new NotFoundHttpException('Habit not found');
+        }
+
+        $occurredAt = new DateTimeImmutable($date);
+        $habit->removeTrackPoint($occurredAt);
+
+        $entityManager->flush();
+
+        return $this->redirectToRoute(
+            'app_habit_week',
+            ['year' => $occurredAt->format('Y'), 'week' => $occurredAt->format('W')]
+        );
     }
 }
